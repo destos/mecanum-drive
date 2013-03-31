@@ -43,17 +43,17 @@ class Base(object):
     def __init__(self, *args, **kwargs):
         self.wheels = kwargs.pop('wheels', Wheels())
         self.js = kwargs.pop('joystick', Joystick())
-        
+
     def calc_speeds(self):
         raise NotImplemented
 
 
+# http://www.chiefdelphi.com/forums/showthread.php?t=84446
 class TankDrive(Base):
-    # tuning params
-    
+    # tuning params? maybe not needed
     Kf = 1 # forward multi
     Kt = 1 # turning multi
-    Ks = 1 
+    Ks = 1 #sliding multi
     
     # average both x axis?
     def calc_speeds(self):
@@ -62,10 +62,10 @@ class TankDrive(Base):
         # Y axis diff average
         Yt = (self.js.y1 - self.js.y2)/2
         
-        W1 = self.Kf*Yf + self.Kt*Yt + self.Ks*self.js.x1
-        W2 = self.Kf*Yf + self.Kt*Yt - self.Ks*self.js.x1
-        W3 = self.Kf*Yf - self.Kt*Yt + self.Ks*self.js.x1
-        W4 = self.Kf*Yf - self.Kt*Yt - self.Ks*self.js.x1
+        W1 = self.Kf*Yf + self.Kt*Yt + self.Ks*self.js.x1 #front left
+        W2 = self.Kf*Yf + self.Kt*Yt - self.Ks*self.js.x1 #front right
+        W3 = self.Kf*Yf - self.Kt*Yt + self.Ks*self.js.x1 #back left 
+        W4 = self.Kf*Yf - self.Kt*Yt - self.Ks*self.js.x1 #back right
         
         # print "%s %s - %s %s" % (W1, W2, W3, W4)
         
