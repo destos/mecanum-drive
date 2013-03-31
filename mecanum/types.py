@@ -1,5 +1,7 @@
 __version__ = '0.0.1'
 
+from servo import ContinuousConst
+
 class Joystick(object):
     pos = [0,0,0,0]
     @property
@@ -20,8 +22,21 @@ class Joystick(object):
 class Wheels(object):
     pos = [0,0,0,0]
     
-    def set(self, pos, point):
-        self.pos[pos] = point
+    def set(self, i, point):
+        self.pos[i] = point
+
+
+class ServoWheels(Wheels):
+    def __init__(self, pwm):
+        super(ServoWheels, self).__init__()
+        self.pwm = pwm
+        # TODO, accept channel asignments
+        for i in range(4):
+            print "setting up wheel: %s" % i
+            self.pos[i] = ContinuousConst(self.pwm, i)
+
+    def set(self, i, point):
+        self.pos[i].set(point)
 
 
 class Base(object):

@@ -1,33 +1,33 @@
-# if __name__ == "__main__":
-    
 from adafruit import PWM
-from servo import Continuous, Servo, Futaba3003, ContinuousConst
-from time import sleep
-import random
+from mecanum.types import TankDrive, ServoWheels
 
+from time import sleep
 from math import sin, pi
 
-pwm = PWM(address=0x40, debug=False)
-pwm.setPWMFreq(50)
+def main():
+    pwm = PWM(address=0x40, debug=False)
+    pwm.setPWMFreq(50)
 
-wheel = ContinuousConst(pwm, 0)
-wheel2 = ContinuousConst(pwm, 1)
+    drive = TankDrive(wheels=ServoWheels(pwm))
 
-wheel.set(0)
-# wheel2.set(0)
+    dur = 100
+    freq = 30
+    factor = 2 * pi * freq/8000
 
-dur = 900
-freq = 30
-factor = 2 * pi * freq/8000
+    # while (True):
+    for seg in range(8 * dur):
+        # sine wave calculations
+        sin_seg = sin(seg * factor)
+        drive.js.pos=[1,-1,sin_seg,-sin_seg]
+        drive.calc_speeds()
+        print "%s" % sin_seg
+        sleep(0.05)
+    
+    # reset joystick and re-calculate wheel speeds, should stop servos
+    drive.js.pos=[0,0,0,0]
+    drive.calc_speeds()
+    
+    pwm.reset()
 
-# while (True):
-for seg in range(10 * dur):
-    # sine wave calculations
-    sin_seg = sin(seg * factor)
-    # sin_seq 
-    deg = int((sin_seg))
-    wheel.set(deg)
-    print "%s" % deg
-    sleep(0.05)
-
-pwm.reset()
+if __name__ == "__main__":
+    main()
