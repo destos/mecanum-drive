@@ -1,43 +1,7 @@
-__version__ = '0.0.1'
+__version__ = (0, 0, 2)
 
-from servo import ContinuousConst
-
-class Joystick(object):
-    pos = [0,0,0,0]
-    @property
-    def x1(self):
-        return float(self.pos[0])
-    @property
-    def x2(self):
-        return float(self.pos[1])
-
-    @property
-    def y1(self):
-        return float(self.pos[2])
-    @property
-    def y2(self):
-        return float(self.pos[3])
-
-
-class Wheels(object):
-    """wheel position starts at the top left and goes clockwise around the vehicle ending at the bottom left"""
-    pos = [0,0,0,0]
-    
-    def set(self, i, point):
-        self.pos[i] = point
-
-
-class ServoWheels(Wheels):
-    def __init__(self, pwm):
-        super(ServoWheels, self).__init__()
-        self.pwm = pwm
-        # TODO, accept channel asignments
-        for i in range(4):
-            print "setting up wheel: %s" % i
-            self.pos[i] = ContinuousConst(self.pwm, i)
-
-    def set(self, i, point):
-        self.pos[i].set(point)
+from hardware.wheels import Wheels
+from hardware.joysticks import Joystick
 
 
 class Base(object):
