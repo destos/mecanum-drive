@@ -5,6 +5,9 @@ from hardware.joysticks import Joystick
 
 
 class Base(object):
+
+    virtual = False
+
     def __init__(self, *args, **kwargs):
         self.wheels = kwargs.pop('wheels', Wheels())
         self.js = kwargs.pop('joystick', Joystick())
