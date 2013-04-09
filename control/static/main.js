@@ -83,20 +83,16 @@ Joystick = (function() {
   }
 
   Joystick.prototype.updateTouchPos = function(x, y) {
-    this.touchPos.reset(x, y);
-    this.vector.copyFrom(this.touchPos);
-    return this.vector.minusEq(this.startPos);
+    return this.touchPos.reset(x, y);
   };
 
   Joystick.prototype.getDriveFactor = function() {
-    var dist, factors, power, radians, x, y;
+    var dist, power;
+    this.vector.copyFrom(this.touchPos);
+    this.vector.minusEq(this.startPos);
     dist = this.startPos.dist(this.touchPos);
-    radians = this.vector.angle(true);
     power = (dist < this.maxDistance ? dist : this.maxDistance) / this.maxDistance;
-    y = Math.sin(radians) * power;
-    x = Math.cos(radians) * power;
-    factors = new Vector2(x, y).reverse().toArray();
-    return factors;
+    return [power.toFixed(2), this.vector.angle(true).toFixed(3)];
   };
 
   Joystick.prototype.draw = function() {
@@ -136,6 +132,8 @@ ControlCanvas = (function() {
 
   ControlCanvas.prototype.prevPositions = [[0, 0], [0, 0]];
 
+  ControlCanvas.prototype.sent = 0;
+
   function ControlCanvas() {
     var canvas;
     _.bindAll(this);
@@ -169,22 +167,26 @@ ControlCanvas = (function() {
     return window.scrollTo(0, 0);
   };
 
-  ControlCanvas.prototype.draw = function() {
-    var left, leftjs, positons, right, rightjs,
-      _this = this;
-    this.c2d.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.joysticks.forEach(function(joystick) {
-      return joystick.draw();
-    });
-    if (this.joysticks.count || !_.isEqual(this.prevPositions, [0, 0], [0, 0])) {
+  ControlCanvas.prototype.emitTrottle = _.throttle(function() {
+    var left, leftjs, positons, right, rightjs;
+    if (this.joysticks.count || !_.isEqual(this.prevPositions, [[0, 0], [0, 0]])) {
       left = (leftjs = this.joysticks.item(this.leftIdentifier)) ? leftjs.getDriveFactor() : [0, 0];
       right = (rightjs = this.joysticks.item(this.rightIdentifier)) ? rightjs.getDriveFactor() : [0, 0];
       positons = [left, right];
       if (!_.isEqual(this.prevPositions, positons)) {
         this.prevPositions = positons;
-        this.socket.emit('joystick update', positons);
+        return this.socket.emit('update', positons);
       }
     }
+  }, 30);
+
+  ControlCanvas.prototype.draw = function() {
+    var _this = this;
+    this.c2d.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.joysticks.forEach(function(joystick) {
+      return joystick.draw();
+    });
+    this.emitTrottle();
     return requestAnimFrame(this.draw);
   };
 

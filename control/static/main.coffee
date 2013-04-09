@@ -1,3 +1,8 @@
+# http://david.blob.core.windows.net/html5/touchjoystick/Touches.html
+# http://seb.ly/2011/04/multi-touch-game-controller-in-javascripthtml5-for-ipad/
+# https://github.com/sebleedelisle/JSTouchController/blob/master/TouchControl.html
+# http://handjs.codeplex.com/documentation
+
 # shim layer with setTimeout fallback
 window.requestAnimFrame = ( ->
     return window.requestAnimationFrame ||
@@ -55,24 +60,25 @@ class Joystick
 
     updateTouchPos: (x, y) ->
         @touchPos.reset(x, y)
+    
+    # TODO: need to get the distance and angle and calculate the new point the joystick should reside at. ( doesn't move past limit)
+    
+    # retuns power and direction in radians
+    getDriveFactor: ->
         @vector.copyFrom(@touchPos)
         @vector.minusEq(@startPos)
-    
-    # need to get the distance and angle and calculate the new point the joystick should reside at.
-    
-    getDriveFactor: ->
         dist = @startPos.dist(@touchPos)
         # angle = @vector.angle() + 180
-        radians = @vector.angle(true)
+        # radians = @vector.angle(true)
         power = (if dist < @maxDistance then dist else @maxDistance) / @maxDistance
-        
-        y = Math.sin(radians) * power
-        x = Math.cos(radians) * power
-        factors = new Vector2(x,y).reverse().toArray()
+        # 
+        # y = Math.sin(radians) * power
+        # x = Math.cos(radians) * power
+        # factors = new Vector2(x,y).reverse().toArray()
         
         # console.log factors
-        return factors
-        # [power, @vector.angle(true)]
+        # return factors
+        [power.toFixed(2), @vector.angle(true).toFixed(3)]
 
     draw: ->
         # TODO: make sure we don't move beyond our distance
@@ -110,7 +116,9 @@ class ControlCanvas
     rightIdentifier: null
 
     prevPositions: [[0,0],[0,0]]
-
+    
+    sent: 0
+    
     constructor: ->
         _.bindAll @
 
@@ -140,7 +148,7 @@ class ControlCanvas
         return @canvas
          
     resetCanvas: (e) ->
-        # resize the canvas - but remember - @ clears the canvas too.
+        # resize the canvas - but remember - this clears the canvas too.
         @canvas.width = window.innerWidth
         @canvas.height = window.innerHeight
         @midpoint = @canvas.width / 2
@@ -148,20 +156,22 @@ class ControlCanvas
         #make sure we scroll to the top left.
         window.scrollTo 0, 0
 
-    draw: ->
-        @c2d.clearRect 0, 0, @canvas.width, @canvas.height
-        @joysticks.forEach (joystick) =>
-            joystick.draw()
-            # joystick.getDriveFactor()
-            
-        if @joysticks.count or not _.isEqual(@prevPositions, [0,0],[0,0])
+    emitTrottle: _.throttle ->
+        if @joysticks.count or not _.isEqual(@prevPositions, [[0,0],[0,0]])
             left = if leftjs = @joysticks.item(@leftIdentifier) then leftjs.getDriveFactor() else [0,0]
             right = if rightjs = @joysticks.item(@rightIdentifier) then rightjs.getDriveFactor() else [0,0]
             positons = [left, right]
             if not _.isEqual(@prevPositions, positons)
                 @prevPositions = positons
-                @socket.emit('joystick update', positons)
-                
+                @socket.emit('update', positons)
+    , 30
+    
+    draw: ->
+        @c2d.clearRect 0, 0, @canvas.width, @canvas.height
+        @joysticks.forEach (joystick) =>
+            joystick.draw()
+            # joystick.getDriveFactor()
+        @emitTrottle()
         requestAnimFrame @draw
 
     onJoystickDown: (e) ->

@@ -1,3 +1,6 @@
+from os import path
+import math
+
 from gevent import monkey; monkey.patch_all()
 import gevent
 
@@ -10,24 +13,35 @@ from mecanum.types import Drive
 from hardware.wheels import ServoWheels
 from hardware.joysticks import JoystickTwoSticks
 
+cur_dir = path.dirname(path.realpath(__file__))
+
 drive = None
 try:
     from adafruit.pwm import PWM
     pwm = PWM(address=0x40, debug=False)
     pwm.setPWMFreq(50)
+    print 'using servo drive system'
     drive = Drive(wheels=ServoWheels(pwm), joystick=JoystickTwoSticks())
 except Exception, e:
     print e
-finally:
+    print 'using virtual drive system'
     drive = Drive(joystick=JoystickTwoSticks())
+    drive.virtual = True
 
+def calc_js(factor):
+    [power, radians] = [float(a) for a in factor]
+    # from ipdb import set_trace; set_trace()
+    # x / y
+    return [-(math.cos(radians) * power), -(math.sin(radians) * power)]
 
-class JoystickPositions(BaseNamespace, BroadcastMixin):
-    def on_joystick_update(self, position):
+class JoystickPositions(BaseNamespace):
+    def on_update(self, positions):
+        positions = [calc_js(pos) for pos in positions]
         global drive
-        drive.js.pos=position
+        drive.js.pos=positions
         drive.calc_speeds()
-        print drive.wheels.pos
+        if drive.virtual:
+            print drive.wheels.pos
         
     # def recv_connect(self):
     #     def sendjoy():
@@ -43,11 +57,12 @@ class Application(object):
 
     def __call__(self, environ, start_response):
         path = environ['PATH_INFO'].strip('/') or 'index.html'
-
+        
         if path.startswith('static/') or path == 'index.html':
             try:
-                data = open(path).read()
-            except Exception:
+                data = open(cur_dir+'/'+path).read()
+            except Exception, e:
+                print e
                 return not_found(start_response)
 
             if path.endswith(".js"):
