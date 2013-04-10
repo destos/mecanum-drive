@@ -1,3 +1,5 @@
+#python -m unittest -v mecanum.test_types.TestDrive
+
 from unittest import TestCase
 
 from .types import TankDrive, Drive

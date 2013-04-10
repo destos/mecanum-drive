@@ -52,16 +52,12 @@ class Drive(Base):
         W4 = self.js.y1 - self.js.x1 + self.js.x2 #back right
         
         # print "%s %s - %s %s" % (W1, W2, W3, W4)
-        
+
         # evenly lower trust along wheels to compensate for directional thrust
-        # high = max([abs(w) for w in [W1,W2,W3,W4]])
-        # print high
-        # if high > 1:
-            # high = high 
-            # print 'high'
-            # print [W1,W2,W3,W4]
-            # [W1,W2,W3,W4] = [ (w/2) for w in [W1,W2,W3,W4]]
-        
+        high = max([abs(w) for w in [W1,W2,W3,W4]])
+        if high > 1:
+            [W1,W2,W3,W4] = [(w/high) for w in [W1,W2,W3,W4]]
+
         self.wheels.set(0, W1)
         self.wheels.set(1, W2)
         self.wheels.set(2, W3)
