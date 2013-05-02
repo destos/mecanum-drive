@@ -135,7 +135,7 @@ ControlCanvas = (function() {
   ControlCanvas.prototype.sent = 0;
 
   function ControlCanvas() {
-    var canvas;
+    var canvas, indicator;
     _.bindAll(this);
     canvas = this.setupCanvas();
     this.joysticks = new Collection();
@@ -147,6 +147,14 @@ ControlCanvas = (function() {
     window.onorientationchange = this.resetCanvas;
     window.onresize = this.resetCanvas;
     this.socket = io.connect('/joysticks');
+    indicator = document.getElementById('connection');
+    this.socket.on('connect', function() {
+      indicator.className = 'on';
+      return console.log('connected');
+    }).on('disconnect', function() {
+      indicator.className = 'off';
+      return console.log('disconnected');
+    });
   }
 
   ControlCanvas.prototype.setupCanvas = function() {

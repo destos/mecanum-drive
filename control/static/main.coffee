@@ -15,6 +15,7 @@ window.requestAnimFrame = ( ->
 )()
 
 
+
 class Collection
     constructor: ->
         @count = 0
@@ -136,6 +137,14 @@ class ControlCanvas
         window.onresize = @resetCanvas
 
         @socket = io.connect('/joysticks')
+
+        indicator = document.getElementById('connection')
+        @socket.on 'connect', ->
+            indicator.className = 'on'
+            console.log 'connected'
+        .on 'disconnect', ->
+            indicator.className = 'off'
+            console.log 'disconnected'
 
     setupCanvas: ->
         @canvas = document.getElementById("joysticks")
