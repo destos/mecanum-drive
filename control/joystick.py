@@ -22,17 +22,20 @@ try:
     pwm.setPWMFreq(50)
     print 'using servo drive system'
     drive = Drive(wheels=ServoWheels(pwm), joystick=JoystickTwoSticks())
+
 except Exception, e:
     print e
     print 'using virtual drive system'
     drive = Drive(joystick=JoystickTwoSticks())
     drive.virtual = True
 
+
+# takes the radian and power to calculate an x/y offset
 def calc_js(factor):
     [power, radians] = [float(a) for a in factor]
-    # from ipdb import set_trace; set_trace()
-    # x / y
+    # [x/y]
     return [-(math.cos(radians) * power), -(math.sin(radians) * power)]
+
 
 class JoystickPositions(BaseNamespace):
     def on_update(self, positions):
@@ -41,6 +44,7 @@ class JoystickPositions(BaseNamespace):
         drive.js.pos=positions
         drive.calc_speeds()
         if drive.virtual:
+            print positions
             print drive.wheels.pos
         
     # def recv_connect(self):

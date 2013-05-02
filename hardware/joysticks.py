@@ -24,11 +24,11 @@ class JoystickTwoSticks(object):
         return float(self.pos[0][0])
     @property
     def x2(self):
-        return float(self.pos[0][1])
+        return float(self.pos[1][0])
 
     @property
     def y1(self):
-        return float(self.pos[1][0])
+        return float(self.pos[0][1])
     @property
     def y2(self):
         return float(self.pos[1][1])
