@@ -43,6 +43,9 @@ class JoystickPositions(BaseNamespace):
         global drive
         drive.js.pos=positions
         drive.calc_speeds()
+        # if debug
+        #     print positions
+        #     print drive.wheels.get_positions()
         if drive.virtual:
             print positions
             print drive.wheels.pos

@@ -53,7 +53,7 @@ Collection = (function() {
 
 Joystick = (function() {
 
-  Joystick.prototype.maxDistance = 60;
+  Joystick.prototype.maxDistance = 100;
 
   Joystick.prototype.nubSize = 30;
 

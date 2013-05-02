@@ -32,8 +32,8 @@ class TankDrive(Base):
         
         W1 = Yf + Yt + Xs + Xt #front left
         W2 = Yf - Yt - Xs - Xt #front right
-        W3 = Yf + Yt - Xs + Xt #back left 
-        W4 = Yf - Yt + Xs - Xt #back right
+        W3 = Yf - Yt + Xs - Xt #back right
+        W4 = Yf + Yt - Xs + Xt #back left
         
         # print "%s %s - %s %s" % (W1, W2, W3, W4)
         
@@ -47,8 +47,8 @@ class Drive(Base):
     def calc_speeds(self):
         W1 = self.js.y1 + self.js.x1 + self.js.x2 #front left
         W2 = self.js.y1 - self.js.x1 - self.js.x2 #front right
-        W3 = self.js.y1 + self.js.x1 - self.js.x2 #back left
-        W4 = self.js.y1 - self.js.x1 + self.js.x2 #back right
+        W3 = self.js.y1 - self.js.x1 + self.js.x2 #back left
+        W4 = self.js.y1 + self.js.x1 - self.js.x2 #back right
 
         # evenly lower thrust along wheels to compensate for inputs higher than 1 and lower than -1
         high = max([abs(w) for w in [W1,W2,W3,W4]])

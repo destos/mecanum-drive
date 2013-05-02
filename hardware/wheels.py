@@ -16,7 +16,14 @@ class ServoWheels(Wheels):
         # TODO, accept channel asignments
         for i in range(4):
             print "setting up wheel: %s" % i
-            self.pos[i] = ContinuousServo(self.pwm, i)
+            flipped = False
+            # flip right side
+            if i in [1,3]:
+                flipped = True
+            self.pos[i] = ContinuousServo(self.pwm, i, flipped=flipped)
 
     def set(self, i, point):
         self.pos[i].set(point)
+
+    def get_positions(self):
+        return [self.pos[i].power for i in range(4)]

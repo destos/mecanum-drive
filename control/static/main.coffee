@@ -40,7 +40,7 @@ class Collection
 
 
 class Joystick
-    maxDistance: 60
+    maxDistance: 100
     nubSize: 30
     constructor: (e, @canvas, @startPos, @touchPos) ->
         _.bindAll @
