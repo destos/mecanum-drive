@@ -1,6 +1,7 @@
 #ipdb
 #ipdbplugin
 #ipython
+git+git://github.com/destos/Adafruit-PWM-Servo-Driver-helpers.git#egg=adafruit
 #gevent requires libevent
 # on linux systems install libevent-dev
 gevent

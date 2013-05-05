@@ -9,20 +9,20 @@ from socketio.server import SocketIOServer
 from socketio.namespace import BaseNamespace
 from socketio.mixins import BroadcastMixin
 
-from mecanum.types import Drive
-from hardware.wheels import ServoWheels
-from hardware.joysticks import JoystickTwoSticks
+from mecanum import Drive
+from hardware import ServoWheels
+from hardware import JoystickTwoSticks
 
 cur_dir = path.dirname(path.realpath(__file__))
 
 drive = None
+
 try:
     from adafruit.pwm import PWM
     pwm = PWM(address=0x40, debug=False)
     pwm.setPWMFreq(50)
     print 'using servo drive system'
     drive = Drive(wheels=ServoWheels(pwm), joystick=JoystickTwoSticks())
-
 except Exception, e:
     print e
     print 'using virtual drive system'
@@ -34,7 +34,7 @@ except Exception, e:
 def calc_js(factor):
     [power, radians] = [float(a) for a in factor]
     # [x/y]
-    return [-(math.cos(radians) * power), -(math.sin(radians) * power)]
+    return [(math.cos(radians) * power), -(math.sin(radians) * power)]
 
 
 class JoystickPositions(BaseNamespace):
@@ -96,10 +96,11 @@ def not_found(start_response):
 
 
 def main():
-    print 'Listening on port http://0.0.0.0:8080 and on port 10843 (flash policy server)'
-    SocketIOServer(('0.0.0.0', 8080), Application(),
+    server = '127.0.0.1'
+    print 'Listening on port http://%s:8080 and on port 10843 (flash policy server)' % server
+    SocketIOServer((server, 8080), Application(),
         resource="socket.io", policy_server=True,
-        policy_listener=('0.0.0.0', 10843)).serve_forever()
+        policy_listener=(server, 10843)).serve_forever()
 
 if __name__ == '__main__':
     main()

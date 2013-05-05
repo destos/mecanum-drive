@@ -1,7 +1,7 @@
 __version__ = (0, 0, 2)
 
-from hardware.wheels import Wheels
-from hardware.joysticks import Joystick
+from hardware import Wheels
+from hardware import Joystick
 
 
 class Base(object):
