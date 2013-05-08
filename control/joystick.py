@@ -18,7 +18,7 @@ cur_dir = path.dirname(path.realpath(__file__))
 drive = None
 
 try:
-    from adafruit.pwm import PWM
+    from adafruit-servos.pwm import PWM
     pwm = PWM(address=0x40, debug=False)
     pwm.setPWMFreq(50)
     print 'using servo drive system'

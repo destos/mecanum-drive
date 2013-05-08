@@ -35,12 +35,13 @@ class TankDrive(Base):
         W3 = Yf - Yt + Xs - Xt #back right
         W4 = Yf + Yt - Xs + Xt #back left
         
-        # print "%s %s - %s %s" % (W1, W2, W3, W4)
-        
-        self.wheels.set(0, W1)
-        self.wheels.set(1, W2)
-        self.wheels.set(2, W4)
-        self.wheels.set(3, W3)
+        # print "%s %s - %s %s" % (W1, W2, W3, W4)        
+        high = max([abs(w) for w in [W1,W2,W3,W4]])
+        for i, wheel in enumerate([W1,W2,W3,W4]):
+            # from ipdb import set_trace; set_trace()
+            if high > 1:
+                wheel = wheel/high
+            self.wheels.set(i, wheel)
 
 
 class Drive(Base):
