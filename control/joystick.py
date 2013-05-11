@@ -18,13 +18,14 @@ cur_dir = path.dirname(path.realpath(__file__))
 drive = None
 
 try:
-    from adafruit-servos.pwm import PWM
+    from adafruit import PWM
     pwm = PWM(address=0x40, debug=False)
     pwm.setPWMFreq(50)
     print 'using servo drive system'
     drive = Drive(wheels=ServoWheels(pwm), joystick=JoystickTwoSticks())
 except Exception, e:
-    print e
+    import sys, traceback
+    traceback.print_exc(file=sys.stdout)
     print 'using virtual drive system'
     drive = Drive(joystick=JoystickTwoSticks())
     drive.virtual = True
