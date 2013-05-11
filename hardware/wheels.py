@@ -11,7 +11,7 @@ class ServoWheels(Wheels):
         super(ServoWheels, self).__init__()
         self.pwm = pwm
         # TODO, accept channel asignments?
-        from adafruit.servos import ContinuousServo
+        from adafruit.hardware import ContinuousServo
         for i in range(4):
             print "setting up wheel: %s" % i
             flipped = False
